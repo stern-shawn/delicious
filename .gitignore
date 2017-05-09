@@ -1,5 +1,5 @@
 # Ignore .env configuration files
-.env
+*.env
 
 # Dependency directory
 node_modules
