@@ -8,12 +8,9 @@ router.get('/', (req, res) => {
   // res.send('Hey! It works!');
   // res.send(req.query.age);
   // res.json(req.query);
-  res.render('hello', Object.assign({
-    name: 'Shawn',
-    age: 26,
-    cool: true,
-    dog: req.query.dog,
-  }));
+  res.render('hello', {
+    title: 'I Love Food'
+  });
 });
 
 router.get('/reverse/:name', (req, res) => {
