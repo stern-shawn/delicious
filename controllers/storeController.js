@@ -13,9 +13,9 @@ exports.addStore = (req, res) => {
 // Time to try async-await!
 exports.createStore = async (req, res) => {
   // req.body already defines the same keys as the schema, we can pass directly
-  const store = new Store(req.body);
-  // Actually save to MongoDB
-  await store.save();
+  // If we inline await/save, store will have access to the generated .slug value
+  const store = await (new Store(req.body)).save();
+  req.flash('success', `Successfully created ${store.name}. Care to leave a review?`);
   // Redirect on completion, await makes this line not execute until store.save() is finished
-  res.redirect('/');
+  res.redirect(`/store/${store.slug}`);
 };
