@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+
 const Store = mongoose.model('Store');
 
 exports.homePage = (req, res) => {

@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+
 mongoose.Promise = global.Promise;  // Use the global (ES6 Node) Promise that's built in!
 const slug = require('slugs');
 
@@ -17,10 +18,10 @@ const storeSchema = new mongoose.Schema({
 });
 
 // Automatically generate a slug for this entry before saving to DB
-storeSchema.pre('save', function(next) {
+storeSchema.pre('save', function autoGenSlug(next) {
   // Only generate a new slug if the name has been changed
   if (!this.isModified('name')) {
-    next(); // Skip 
+    next(); // Skip
     return; // Stop the function from running
   }
   this.slug = slug(this.name);

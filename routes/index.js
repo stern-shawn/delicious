@@ -1,7 +1,8 @@
 const express = require('express');
-const router = express.Router();
 const storeController = require('../controllers/storeController');
 const { catchErrors } = require('../handlers/errorHandlers');
+
+const router = express.Router();
 
 // Do work here
 router.get('/', storeController.homePage);
