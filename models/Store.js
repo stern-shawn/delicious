@@ -15,6 +15,24 @@ const storeSchema = new mongoose.Schema({
     trim: true,
   },
   tags: [String], // Format for 'this is an array of strings'
+  created: {
+    type: Date,
+    default: Date.now,
+  },
+  location: {
+    type: { // Special format for declaring geolocation type
+      type: String,
+      default: 'Point',
+    },
+    coordinates: [{
+      type: Number,
+      required: 'You must supply coordinates!',
+    }],
+    address: {
+      type: String,
+      required: 'You must supply an address!',
+    },
+  },
 });
 
 // Automatically generate a slug for this entry before saving to DB
