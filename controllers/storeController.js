@@ -20,3 +20,9 @@ exports.createStore = async (req, res) => {
   // Redirect on completion, await makes this line not execute until store.save() is finished
   res.redirect(`/store/${store.slug}`);
 };
+
+exports.getStores = async (req, res) => {
+  // Get our stores from the database first
+  const stores = await Store.find();
+  res.render('stores', { title: 'Stores', stores });
+};
