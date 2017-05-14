@@ -95,7 +95,12 @@ exports.resize = async (req, res, next) => {
 };
 
 exports.getStoresByTag = async (req, res) => {
-  const tags = await Store.getTagsList();
   const activeTag = req.params.tag;
-  res.render('tag', { title: 'tags', tags, activeTag });
+  // Add tagQuery so that if no active tag is defined, grab all stores (each one has a tags array)
+  const tagQuery = activeTag || { $exists: true };
+  const tagsPromise = Store.getTagsList();
+  const storesPromise = Store.find({ tags: tagQuery });
+  // Use Promise.all to wait for both promises to resolve, then destructure the result!
+  const [tags, stores] = await Promise.all([tagsPromise, storesPromise]);
+  res.render('tag', { title: 'tags', tags, activeTag, stores });
 };
