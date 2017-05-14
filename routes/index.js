@@ -9,8 +9,18 @@ router.get('/', catchErrors(storeController.getStores));
 router.get('/stores', catchErrors(storeController.getStores));
 router.get('/stores/:id/edit', catchErrors(storeController.editStore));
 router.get('/add', storeController.addStore);
-// Since createStore is async-await, wrap it in a helper try/catch function
-router.post('/add', catchErrors(storeController.createStore));
-router.post('/add/:id', catchErrors(storeController.updateStore));
+
+// Add upload and resize middlewares so that photos can be uploaded to stores
+router.post('/add',
+  storeController.upload,
+  catchErrors(storeController.resize),
+  catchErrors(storeController.createStore) // eslint-disable-line comma-dangle
+);
+
+router.post('/add/:id',
+  storeController.upload,
+  catchErrors(storeController.resize),
+  catchErrors(storeController.updateStore) // eslint-disable-line comma-dangle
+);
 
 module.exports = router;

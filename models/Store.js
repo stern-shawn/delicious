@@ -33,6 +33,7 @@ const storeSchema = new mongoose.Schema({
       required: 'You must supply an address!',
     },
   },
+  photo: String,
 });
 
 // Automatically generate a slug for this entry before saving to DB

@@ -1,6 +1,21 @@
 const mongoose = require('mongoose');
+const multer = require('multer');
+const jimp = require('jimp');
+const uuid = require('uuid');
 
 const Store = mongoose.model('Store');
+const multerOptions = {
+  storage: multer.memoryStorage(),
+  fileFilter(req, file, next) {
+    const isPhoto = file.mimetype.startsWith('image/');
+    if (isPhoto) {
+      // Node convention for 'everything is great, pass along second value to next middleware
+      next(null, true);
+    } else {
+      next({ message: 'That filetype isn\'t allowed!' }, false);
+    }
+  },
+};
 
 exports.homePage = (req, res) => {
   // Render the index.pug template, and pass a title of 'Index'
@@ -46,5 +61,27 @@ exports.updateStore = async (req, res) => {
   }).exec();
   // 2. Redirect them to the edited store's page and notify of success
   req.flash('success', `Successfully updated <strong>${store.name}</strong>. <a href="/stores/${store.slug}">View Store ➡</a>`);
-  res.redirect(`/stores/${store._id}/edit`);
+  res.redirect(`/stores/${store._id}/edit`); // eslint-disable-line no-underscore-dangle
+};
+
+exports.upload = multer(multerOptions).single('photo');
+
+exports.resize = async (req, res, next) => {
+  // If there is no file to resize, skip this process entirely
+  if (!req.file) {
+    next(); // skip to the next middleware
+    return;
+  }
+  // Get the file extension
+  const ext = req.file.mimetype.split('/')[1]; // ex. split 'image/jpeg' and take 'jpeg'
+  // Generate a unique name for the photo and add it to request body since we save using req.body
+  req.body.photo = `${uuid.v4()}.${ext}`;
+  // Now, read the file
+  const photo = await jimp.read(req.file.buffer);
+  // Resize it
+  await photo.resize(800, jimp.AUTO);
+  // Write to filesystem
+  await photo.write(`./public/uploads/${req.body.photo}`);
+  // Go on to createStore() now that req.body has a reference to the photo
+  next();
 };
