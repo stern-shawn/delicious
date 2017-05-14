@@ -11,7 +11,10 @@ router.get('/', catchErrors(storeController.getStores));
 router.get('/store/:slug', catchErrors(storeController.getStoreBySlug));
 router.get('/stores', catchErrors(storeController.getStores));
 router.get('/stores/:id/edit', catchErrors(storeController.editStore));
-router.get('/add', storeController.addStore);
+router.get('/add',
+  authController.isLoggedIn,
+  storeController.addStore // eslint-disable-line comma-dangle
+);
 
 // Add upload and resize middlewares so that photos can be uploaded to stores
 router.post('/add',
@@ -32,7 +35,7 @@ router.get('/tags/:tag', catchErrors(storeController.getStoresByTag));
 router.get('/login', userController.loginForm);
 router.post('/login',
   authController.sanitizeLogin,
-  authController.login
+  authController.login // eslint-disable-line comma-dangle
 );
 
 router.get('/register', userController.registerForm);
@@ -43,7 +46,7 @@ router.get('/register', userController.registerForm);
 router.post('/register',
   userController.validateRegister,
   userController.register,
-  authController.login
+  authController.login // eslint-disable-line comma-dangle
 );
 
 router.get('/logout', authController.logout);

@@ -29,7 +29,18 @@ exports.login = passport.authenticate('local', {
 });
 
 exports.logout = (req, res) => {
+  // .logout() provided by passport middleware
   req.logout();
   req.flash('success', 'You are now logged out!');
   res.redirect('/');
+};
+
+// Check user status before allowing access to route
+exports.isLoggedIn = (req, res, next) => {
+  // Check if user is authenticated
+  if (req.isAuthenticated()) {
+    next(); // User logged in, carry on
+  }
+  req.flash('error', 'You must be logged in to add a store!');
+  res.redirect('/login');
 };
