@@ -42,6 +42,14 @@ exports.getStores = async (req, res) => {
   res.render('stores', { title: 'Stores', stores });
 };
 
+exports.getStoreBySlug = async (req, res, next) => {
+  const store = await Store.findOne({ slug: req.params.slug });
+  // If MongoDB returns null for our query, let middleware handle the 404
+  if (!store) return next();
+  // Otherwise, render our store template with the returned store json
+  res.render('store', { title: store.name, store });
+};
+
 exports.editStore = async (req, res) => {
   // 1. Get the store by id
   const store = await Store.findOne({ _id: req.params.id });
