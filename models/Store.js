@@ -57,4 +57,16 @@ storeSchema.pre('save', async function autoGenSlug(next) {
   next();
 });
 
+// Instead of manually getting all stores and summing tag counts, let MongoDB do the aggregation
+storeSchema.statics.getTagsList = function generateTagList() {
+  return this.aggregate([
+    // Turn tags into single entries instead of arrays
+    { $unwind: '$tags' },
+    // Group together all tags by name, sum them together, and store as 'count' field
+    { $group: { _id: '$tags', count: { $sum: 1 } } },
+    // Sort in descending order
+    { $sort: { count: -1 } },
+  ]);
+};
+
 module.exports = mongoose.model('Store', storeSchema);

@@ -24,4 +24,7 @@ router.post('/add/:id',
   catchErrors(storeController.updateStore) // eslint-disable-line comma-dangle
 );
 
+router.get('/tags', catchErrors(storeController.getStoresByTag));
+router.get('/tags/:tag', catchErrors(storeController.getStoresByTag));
+
 module.exports = router;

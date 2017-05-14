@@ -93,3 +93,9 @@ exports.resize = async (req, res, next) => {
   // Go on to createStore() now that req.body has a reference to the photo
   next();
 };
+
+exports.getStoresByTag = async (req, res) => {
+  const tags = await Store.getTagsList();
+  const activeTag = req.params.tag;
+  res.render('tag', { title: 'tags', tags, activeTag });
+};
