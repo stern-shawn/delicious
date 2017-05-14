@@ -22,6 +22,12 @@ const userSchema = new Schema({
   },
 });
 
+// Generate link to User's gravatar when needed, don't actually store in MongoDB
+userSchema.virtual('gravatar').get(function getGravatar() {
+  const hash = md5(this.email);
+  return `https://gravatar.com/avatar/${hash}?s=200`;
+});
+
 userSchema.plugin(passportLocalMongoose, { usernameField: 'email' });
 userSchema.plugin(mongodbErrorHandler);
 
