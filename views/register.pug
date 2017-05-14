@@ -5,15 +5,15 @@ block content
     h2 register
     form.form(action="/register" method="POST")
       label(for="name") Name
-      input(type="text" name="name")
+      input(type="text" name="name" required)
 
       label(for="email") Email
-      input(type="email" name="email")
+      input(type="email" name="email" required)
 
       label(for="password") Password
-      input(type="password" name="password")
+      input(type="password" name="password" required)
 
       label(for="password-confirm") Confirm Password
-      input(type="password" name="password-confirm")
+      input(type="password" name="password-confirm" required)
 
       input.button(type="submit" value="Register ➡")
