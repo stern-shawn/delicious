@@ -41,6 +41,5 @@ exports.register = async (req, res, next) => {
   // promisify(method, object the method is bound to)
   const register = promisify(User.register, User);
   await register(user, req.body.password);
-  res.send('Me worky!');
   next(); // Continue on to authController.login
 };
