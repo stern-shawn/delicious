@@ -1,4 +1,9 @@
 const passport = require('passport');
+const crypto = require('crypto');
+const mongoose = require('mongoose');
+const promisify = require('es6-promisify');
+
+const User = mongoose.model('User');
 
 // By default I wasn't able to login with my normal email (stern.shawn@gmail.com)
 // yet sternshawn@gmail.com was working. Need to apply same sanitiziation as we do during register
@@ -43,4 +48,77 @@ exports.isLoggedIn = (req, res, next) => {
   }
   req.flash('error', 'You must be logged in to add a store!');
   res.redirect('/login');
+};
+
+exports.forgot = async (req, res) => {
+  // 1 - Does user exist?
+  const user = await User.findOne({ email: req.body.email });
+  if (!user) {
+    req.flash('error', 'No account with that email exists');
+    return res.redirect('/login');
+  }
+
+  // 2 - Set reset tokens and expiry on that account
+  user.resetPasswordToken = crypto.randomBytes(20).toString('hex');
+  user.resetPasswordExpires = Date.now() + 3600000; // 1 hour from now
+  await user.save();
+
+  // 3 - Send an email with the token!
+  // TODO - For now, flash the URL so we can test that this works (SUPER INSECURE, ONLY FOR DEV)
+  const resetURL = `http://${req.headers.host}/account/reset/${user.resetPasswordToken}`;
+  req.flash('success', `You have been emailed a password reset link. ${resetURL}`);
+
+  // 4 - Redirect to the login page so they can use their new credentials
+  res.redirect('/login');
+};
+
+exports.reset = async (req, res) => {
+  const user = await User.findOne({
+    resetPasswordToken: req.params.token,
+    resetPasswordExpires: { $gt: Date.now() },
+  });
+
+  // No user found, redirect them
+  if (!user) {
+    req.flash('error', 'Password reset is invalid or has expired');
+    return res.redirect('/login');
+  }
+
+  // Show the reset form
+  res.render('reset', { title: 'Reset your password' });
+};
+
+exports.confirmedPasswords = (req, res, next) => {
+  if (req.body.password === req.body['password-confirm']) {
+    return next(); // They match, keep going
+  }
+  req.flash('error', 'Passwords do not match');
+  res.redirect('back');
+};
+
+exports.update = async (req, res) => {
+  const user = await User.findOne({
+    resetPasswordToken: req.params.token,
+    resetPasswordExpires: { $gt: Date.now() },
+  });
+
+  // No user found, redirect them
+  if (!user) {
+    req.flash('error', 'Password reset is invalid or has expired');
+    return res.redirect('/login');
+  }
+
+  const setPassword = promisify(user.setPassword, user);
+  await setPassword(req.body.password);
+
+  // Now that password is reset, clear the token/expire timestamps and save to MongoDB
+  user.resetPasswordToken = undefined;
+  user.resetPasswordExpires = undefined;
+  const updatedUser = await user.save();
+
+  // We can call .login on a user object and PassportJS will log them in automatically
+  await req.login(updatedUser);
+
+  req.flash('success', 'Your password has been reset! You are now logged in!');
+  res.redirect('/');
 };

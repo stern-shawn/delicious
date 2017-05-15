@@ -20,6 +20,8 @@ const userSchema = new Schema({
     type: String,
     required: 'Please supply a name',
   },
+  resetPasswordToken: String,
+  resetPasswordExpires: Date,
 });
 
 // Generate link to User's gravatar when needed, don't actually store in MongoDB
