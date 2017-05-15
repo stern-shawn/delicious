@@ -51,4 +51,10 @@ router.post('/register',
 
 router.get('/logout', authController.logout);
 
+router.get('/account',
+  authController.isLoggedIn,
+  userController.account // eslint-disable-line comma-dangle
+);
+router.post('/account', catchErrors(userController.updateAccount));
+
 module.exports = router;
