@@ -28,6 +28,7 @@ exports.addStore = (req, res) => {
 
 // Time to try async-await!
 exports.createStore = async (req, res) => {
+  req.body.author = req.user._id; // eslint-disable-line no-underscore-dangle
   // req.body already defines the same keys as the schema, we can pass directly
   // If we inline await/save, store will have access to the generated .slug value
   const store = await (new Store(req.body)).save();
@@ -43,18 +44,24 @@ exports.getStores = async (req, res) => {
 };
 
 exports.getStoreBySlug = async (req, res, next) => {
-  const store = await Store.findOne({ slug: req.params.slug });
+  const store = await Store.findOne({ slug: req.params.slug }).populate('author');
   // If MongoDB returns null for our query, let middleware handle the 404
   if (!store) return next();
   // Otherwise, render our store template with the returned store json
   res.render('store', { title: store.name, store });
 };
 
+const confirmOwner = (store, user) => {
+  if (!store.author.equals(user._id)) { // eslint-disable-line no-underscore-dangle
+    throw Error('You must own this store in order to edit it!');
+  }
+};
+
 exports.editStore = async (req, res) => {
   // 1. Get the store by id
   const store = await Store.findOne({ _id: req.params.id });
   // 2. Confirm user has permissions to edit the store
-  // TODO, no auth yet... :(
+  confirmOwner(store, req.user);
   // 3. Render the edit form to the user
   res.render('editStore', { title: `Edit ${store.name}`, store });
 };

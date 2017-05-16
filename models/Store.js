@@ -34,6 +34,11 @@ const storeSchema = new mongoose.Schema({
     },
   },
   photo: String,
+  author: {
+    type: mongoose.Schema.ObjectId,
+    ref: 'User',
+    required: 'You must supply an author',
+  },
 });
 
 // Automatically generate a slug for this entry before saving to DB
