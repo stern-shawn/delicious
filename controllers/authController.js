@@ -45,7 +45,7 @@ exports.logout = (req, res) => {
 exports.isLoggedIn = (req, res, next) => {
   // Check if user is authenticated
   if (req.isAuthenticated()) {
-    next(); // User logged in, carry on
+    return next(); // User logged in, carry on. Make sure to return to stop execution here
   }
   req.flash('error', 'You must be logged in to add a store!');
   res.redirect('/login');
