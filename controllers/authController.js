@@ -2,6 +2,7 @@ const passport = require('passport');
 const crypto = require('crypto');
 const mongoose = require('mongoose');
 const promisify = require('es6-promisify');
+const mail = require('../handlers/mail');
 
 const User = mongoose.model('User');
 
@@ -51,6 +52,13 @@ exports.isLoggedIn = (req, res, next) => {
 };
 
 exports.forgot = async (req, res) => {
+  // Normalize the email address...
+  req.sanitizeBody('email').normalizeEmail({
+    remove_dots: false,
+    remove_extension: false,
+    gmail_remove_subaddress: false,
+  });
+
   // 1 - Does user exist?
   const user = await User.findOne({ email: req.body.email });
   if (!user) {
@@ -64,9 +72,14 @@ exports.forgot = async (req, res) => {
   await user.save();
 
   // 3 - Send an email with the token!
-  // TODO - For now, flash the URL so we can test that this works (SUPER INSECURE, ONLY FOR DEV)
   const resetURL = `http://${req.headers.host}/account/reset/${user.resetPasswordToken}`;
-  req.flash('success', `You have been emailed a password reset link. ${resetURL}`);
+  await mail.send({
+    user,
+    subject: 'Password Reset',
+    resetURL,
+    filename: 'password-reset',
+  });
+  req.flash('success', 'You have been emailed a password reset link.');
 
   // 4 - Redirect to the login page so they can use their new credentials
   res.redirect('/login');
