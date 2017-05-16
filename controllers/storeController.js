@@ -68,7 +68,7 @@ exports.updateStore = async (req, res) => {
     runValidators: true,
   }).exec();
   // 2. Redirect them to the edited store's page and notify of success
-  req.flash('success', `Successfully updated <strong>${store.name}</strong>. <a href="/stores/${store.slug}">View Store ➡</a>`);
+  req.flash('success', `Successfully updated <strong>${store.name}</strong>. <a href="/store/${store.slug}">View Store ➡</a>`);
   res.redirect(`/stores/${store._id}/edit`); // eslint-disable-line no-underscore-dangle
 };
 
