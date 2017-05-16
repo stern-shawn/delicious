@@ -28,3 +28,12 @@ exports.menu = [
   { slug: '/add', title: 'Add', icon: 'add' },
   { slug: '/map', title: 'Map', icon: 'map' },
 ];
+
+// Cut down lengthy store descriptions, but don't do unnecessary work on short ones
+exports.truncate = (description) => {
+  const separated = description.split(' ');
+  if (separated.length > 20) {
+    return separated.slice(0, 20).join(' ').concat('...');
+  }
+  return description;
+};

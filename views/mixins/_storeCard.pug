@@ -12,4 +12,4 @@ mixin storeCard(store = {})
         a(href=`/store/${store.slug}`)= store.name
     .store__details
       //- Use split/slice/join to truncate. Use concat to add in an ellipsis for flair
-      p= store.description.split(' ').slice(0, 25).join(' ').concat('...')
+      p= h.truncate(store.description)
