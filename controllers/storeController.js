@@ -113,12 +113,25 @@ exports.getStoresByTag = async (req, res) => {
 };
 
 exports.searchStores = async (req, res) => {
-  const stores = await Store.find({
+  const stores = await Store
+  // Find stores by the given search query
+  .find({
     // Since we have both name and description indexed as text, we can do this...
     $text: {
       // Search for text fields (both name/description since they're compound) including our query
       $search: req.query.q,
     },
-  });
+  }, {
+    // Project a 'score' onto each result, so we can sort by results which have heavier weight
+    // ie. If I search for coffee, give me results with more refs to coffee first
+    score: { $meta: 'textScore' },
+  })
+  // Sort the results with highest textScore first (descending, default is ascending apparently)
+  .sort({
+    score: { $meta: 'textScore' },
+  })
+  // Limit our results to the top 5
+  .limit(5);
+
   res.json(stores);
 };
