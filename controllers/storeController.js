@@ -111,3 +111,14 @@ exports.getStoresByTag = async (req, res) => {
   const [tags, stores] = await Promise.all([tagsPromise, storesPromise]);
   res.render('tag', { title: 'tags', tags, activeTag, stores });
 };
+
+exports.searchStores = async (req, res) => {
+  const stores = await Store.find({
+    // Since we have both name and description indexed as text, we can do this...
+    $text: {
+      // Search for text fields (both name/description since they're compound) including our query
+      $search: req.query.q,
+    },
+  });
+  res.json(stores);
+};

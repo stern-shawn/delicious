@@ -64,4 +64,8 @@ router.post('/account/reset/:token',
   catchErrors(authController.update) // eslint-disable-line comma-dangle
 );
 
+// API Endpoints
+
+router.get('/api/search', catchErrors(storeController.searchStores));
+
 module.exports = router;
