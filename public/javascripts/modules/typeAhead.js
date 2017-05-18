@@ -25,15 +25,17 @@ function typeAhead(search) {
 
     // Show results
     searchResults.style.display = 'block';
-    // Clear out content until we get a match (ie. user deletes a letter, etc)
-    searchResults.innerHTML = '';
 
     axios.get(`/api/search?q=${this.value}`)
       .then((res) => {
         if (res.data.length) {
           // If we have any results, render them inside the search results div
           searchResults.innerHTML = searchResultsHTML(res.data);
+          return;
         }
+
+        // Otherwise, indicate that there are no results for this query
+        searchResults.innerHTML = `<div class="search__result">No results for ${this.value} found!</div>`;
       })
       .catch((err) => {
         console.error(err);
