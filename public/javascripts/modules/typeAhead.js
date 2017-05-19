@@ -1,5 +1,5 @@
-const axios = require('axios');
-const dompurify = require('dompurify');
+import axios from 'axios';
+import dompurify from 'dompurify';
 
 // Given an array of store results, generate the HTML for each link
 function searchResultsHTML(stores) {
