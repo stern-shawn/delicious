@@ -135,3 +135,29 @@ exports.searchStores = async (req, res) => {
 
   res.json(stores);
 };
+
+// API for grabbing stores within 10km of the given coordinates
+// Syntax: /api/stores/near?lat=x&lng=x
+exports.mapStores = async (req, res) => {
+  // Grab coordinates and convert from strings to floats
+  const coordinates = [req.query.lng, req.query.lat].map(parseFloat);
+  const q = {
+    location: {
+      $near: {
+        $geometry: {
+          type: 'Point',
+          coordinates,
+        },
+        $maxDistance: 10000, // 10km radius
+      },
+    },
+  };
+
+  // Use .select to only return the fields we want, reducing the size of each AJAX call for speed
+  const stores = await Store
+    .find(q)
+    .select('slug name description location')
+    .limit(10);
+
+  res.json(stores);
+};

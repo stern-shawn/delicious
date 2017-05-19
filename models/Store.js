@@ -47,6 +47,8 @@ storeSchema.index({
   description: 'text',
 });
 
+storeSchema.index({ location: '2dsphere' });
+
 // Automatically generate a slug for this entry before saving to DB
 storeSchema.pre('save', async function autoGenSlug(next) {
   // Only generate a new slug if the name has been changed
