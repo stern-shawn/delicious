@@ -4,8 +4,11 @@ import '../sass/style.scss';
 import { $, $$ } from './modules/bling';
 import autocomplete from './modules/autocomplete';
 import typeAhead from './modules/typeAhead';
+import makeMap from './modules/map';
 
 autocomplete($('#address'), $('#lat'), $('#lng'));
 
 // Attach our search handlers to the search element
 typeAhead($('.search'));
+
+makeMap($('#map'));
