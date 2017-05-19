@@ -156,7 +156,7 @@ exports.mapStores = async (req, res) => {
   // Use .select to only return the fields we want, reducing the size of each AJAX call for speed
   const stores = await Store
     .find(q)
-    .select('slug name description location')
+    .select('slug name description location photo')
     .limit(10);
 
   res.json(stores);

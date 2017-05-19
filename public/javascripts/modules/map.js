@@ -18,6 +18,7 @@ function loadPlaces(map, lat = 43.2, lng = -79.8) {
 
       // Create map bounds
       const bounds = new google.maps.LatLngBounds();
+      const infoWindow = new google.maps.InfoWindow();
 
       // Create our list of markers to render to the map
       const markers = places.map((place) => {
@@ -28,6 +29,20 @@ function loadPlaces(map, lat = 43.2, lng = -79.8) {
         marker.place = place;
         return marker;
       });
+
+      // Show details of a marker when it is clicked
+      markers.forEach(marker => marker.addListener('click', function markerInfo() {
+        const place = this.place;
+        const html = `
+          <div class="popup">
+            <a href="/store/${place.slug}">
+              <img src="/uploads/${place.photo || 'store.png'}" alt="${place.name}"/>
+              <p>${place.name} - ${place.location.address}</p>
+            </a>
+          </div>`;
+        infoWindow.setContent(html);
+        infoWindow.open(map, this);
+      }));
 
       // Center and zoom map to fit our markers
       map.setCenter(bounds.getCenter());
