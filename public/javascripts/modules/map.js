@@ -57,8 +57,14 @@ function makeMap(mapDiv) {
   const map = new google.maps.Map(mapDiv, mapConfig);
   loadPlaces(map);
 
+  // Enable Google Maps autocomplete for the input
+  // Query our API + update our map when a new location is selected
   const input = $('[name="geolocate"]');
   const autocomplete = new google.maps.places.Autocomplete(input);
+  autocomplete.addListener('place_changed', () => {
+    const place = autocomplete.getPlace();
+    loadPlaces(map, place.geometry.location.lat(), place.geometry.location.lng());
+  });
 }
 
 export default makeMap;
