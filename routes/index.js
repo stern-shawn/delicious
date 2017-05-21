@@ -66,6 +66,11 @@ router.post('/account/reset/:token',
 
 router.get('/map', storeController.mapPage);
 
+router.get('/hearts',
+  authController.isLoggedIn,
+  catchErrors(storeController.getHearts) // eslint-disable-line comma-dangle
+);
+
 // API Endpoints
 // GETS
 router.get('/api/search', catchErrors(storeController.searchStores));
