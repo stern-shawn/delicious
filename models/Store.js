@@ -39,6 +39,11 @@ const storeSchema = new mongoose.Schema({
     ref: 'User',
     required: 'You must supply an author',
   },
+}, {
+  // By default, virtual fields like reviews are attached but not visible for dumps,
+  // but passing these arguments will tell MongoDB to attach them as normal fields
+  toJSON: { virtuals: true },
+  toObject: { virtuals: true },
 });
 
 // Define some indexes
@@ -81,5 +86,13 @@ storeSchema.statics.getTagsList = function generateTagList() {
     { $sort: { count: -1 } },
   ]);
 };
+
+// Find reviews where the store _id matches the store property in a review object
+storeSchema.virtual('reviews', {
+  ref: 'Review', // What model are we linking
+  // The fields below should match
+  localField: '_id', // The field we're matching with from Store (this)
+  foreignField: 'store', // The field we're matching with from Review
+});
 
 module.exports = mongoose.model('Store', storeSchema);

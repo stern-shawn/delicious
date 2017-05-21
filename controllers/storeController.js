@@ -46,7 +46,7 @@ exports.getStores = async (req, res) => {
 };
 
 exports.getStoreBySlug = async (req, res, next) => {
-  const store = await Store.findOne({ slug: req.params.slug }).populate('author');
+  const store = await Store.findOne({ slug: req.params.slug }).populate('author reviews');
   // If MongoDB returns null for our query, let middleware handle the 404
   if (!store) return next();
   // Otherwise, render our store template with the returned store json
