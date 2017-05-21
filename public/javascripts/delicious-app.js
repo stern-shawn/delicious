@@ -5,6 +5,7 @@ import { $, $$ } from './modules/bling';
 import autocomplete from './modules/autocomplete';
 import typeAhead from './modules/typeAhead';
 import makeMap from './modules/map';
+import ajaxHeart from './modules/heart';
 
 autocomplete($('#address'), $('#lat'), $('#lng'));
 
@@ -12,3 +13,6 @@ autocomplete($('#address'), $('#lat'), $('#lng'));
 typeAhead($('.search'));
 
 makeMap($('#map'));
+
+// Select all forms, and handle their submission events with ajaxHeart
+$$('form.heart').on('submit', ajaxHeart);
