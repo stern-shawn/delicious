@@ -87,6 +87,33 @@ storeSchema.statics.getTagsList = function generateTagList() {
   ]);
 };
 
+// Generate a list of the top 10 Stores based on average review (if more than 1 review)
+storeSchema.statics.getTopStores = function generateTopStores() {
+  return this.aggregate([
+    // Get our stores, populate their reviews. (Mongo takes the model name Review and converts to
+    // 'reviews' when you do lookup, be careful about this). We don't actually have access to the
+    // virtual field 'reviews' at this level...
+    // 'as' is the name given to the result
+    { $lookup: { from: 'reviews', localField: '_id', foreignField: 'store', as: 'reviews' } },
+    // Filter for stores with 2+ reviews (in MongoDB world, get reviews with index 1)
+    { $match: { 'reviews.1': { $exists: true } } },
+    // Add an average reviews field by taking the $avg of each aggregate's .rating items
+    // In MongoDB 3.4+ we can use $addField instead of $project to keep our other fields...
+    // Since we're in 3.2, we'll need to add back our fields using $$ROOT's properties
+    { $project: {
+      photo: '$$ROOT.photo',
+      name: '$$ROOT.name',
+      slug: '$$ROOT.slug',
+      reviews: '$$ROOT.reviews',
+      averageRating: { $avg: '$reviews.rating' },
+    } },
+    // Sort by average review field w/ highest rating first
+    { $sort: { averageRating: -1 } },
+    // Limit to first/top 10 at most
+    { $limit: 10 },
+  ]);
+};
+
 // Find reviews where the store _id matches the store property in a review object
 storeSchema.virtual('reviews', {
   ref: 'Review', // What model are we linking
@@ -94,5 +121,13 @@ storeSchema.virtual('reviews', {
   localField: '_id', // The field we're matching with from Store (this)
   foreignField: 'store', // The field we're matching with from Review
 });
+
+function autoPopulate(next) {
+  this.populate('reviews');
+  next();
+}
+
+storeSchema.pre('find', autoPopulate);
+storeSchema.pre('findOne', autoPopulate);
 
 module.exports = mongoose.model('Store', storeSchema);

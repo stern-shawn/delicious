@@ -77,6 +77,8 @@ router.post('/reviews/:id',
   catchErrors(reviewController.addReview) // eslint-disable-line comma-dangle
 );
 
+router.get('/top', catchErrors(storeController.getTopStores));
+
 // API Endpoints
 // GETS
 router.get('/api/search', catchErrors(storeController.searchStores));
