@@ -182,6 +182,9 @@ exports.heartStore = async (req, res) => {
 };
 
 exports.getHearts = async (req, res) => {
+  // The current user contains a list of hearted store ids, search all stores, and return only those
+  // that are in ($in) that array
   const stores = await Store.find({ _id: { $in: req.user.hearts } });
+  // Reuse the stores template, except now we're just passing in a subset of stores
   res.render('stores', { title: 'Hearted Stores', stores });
 };
