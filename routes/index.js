@@ -2,6 +2,7 @@ const express = require('express');
 const storeController = require('../controllers/storeController');
 const userController = require('../controllers/userController');
 const authController = require('../controllers/authController');
+const reviewController = require('../controllers/reviewController');
 const { catchErrors } = require('../handlers/errorHandlers');
 
 const router = express.Router();
@@ -69,6 +70,11 @@ router.get('/map', storeController.mapPage);
 router.get('/hearts',
   authController.isLoggedIn,
   catchErrors(storeController.getHearts) // eslint-disable-line comma-dangle
+);
+
+router.post('/reviews/:id',
+  authController.isLoggedIn,
+  catchErrors(reviewController.addReview) // eslint-disable-line comma-dangle
 );
 
 // API Endpoints
