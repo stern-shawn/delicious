@@ -40,9 +40,36 @@ exports.createStore = async (req, res) => {
 };
 
 exports.getStores = async (req, res) => {
+  // Add pagination
+  const page = req.params.page || 1;
+  // In case the user tries to get clever and find page/-1 or something
+  if (page < 1) {
+    req.flash('info', 'Invalid request, redirecting to page 1');
+    res.redirect('/stores/');
+    return;
+  }
+  const limit = 6;
+  const skip = (page * limit) - limit;
+
   // Get our stores from the database first
-  const stores = await Store.find();
-  res.render('stores', { title: 'Stores', stores });
+  const storesPromise = Store
+    .find()
+    .skip(skip)
+    .limit(limit)
+    .sort({ created: 'desc' });
+  // Get a count of how many stores there are, total
+  const countPromise = Store.count();
+  // Wait for the result of both queries
+  const [stores, count] = await Promise.all([storesPromise, countPromise]);
+  const pages = Math.ceil(count / limit);
+
+  if (!stores.length && skip) {
+    req.flash('info', `You asked for page ${page} which doesn't exist! Redirecting to page ${pages}`);
+    res.redirect(`/stores/page/${pages}`);
+    return;
+  }
+
+  res.render('stores', { title: 'Stores', stores, page, pages, count });
 };
 
 exports.getStoreBySlug = async (req, res, next) => {
