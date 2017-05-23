@@ -11,6 +11,9 @@
       opacity: 0;
       top: 0;
     }
+    &:hover {
+      cursor: pointer;
+    }
     svg {
       width: 25px;
       fill: white;
